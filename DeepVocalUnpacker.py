@@ -144,18 +144,19 @@ def unpack():
         while search_pos + 8 <= block_end:
             if skc_data[search_pos:search_pos + 4] == b'\x00\x44\x2C\x47':
                 search_pos += 4
-                wav_raw_size = struct.unpack_from("<I", skc_data, search_pos)[0]
+                wav_raw_size = struct.unpack_from("<I", skc_data, search_pos)[0] * 2
                 search_pos += 5
 
                 if search_pos + wav_raw_size <= block_end:
-                    raw_data = skc_data[search_pos:search_pos + (wav_raw_size & ~1)]
+                    raw_data = skc_data[search_pos:search_pos + wav_raw_size]
+                    
                     sound = AudioSegment(
                         data=raw_data,
                         sample_width=2,
                         frame_rate=44100,
                         channels=1
                     )
-
+                    
                     if should_merge:
                         merged_sound += sound
                     else:
